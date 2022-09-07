@@ -1,22 +1,18 @@
-import { useDispatch } from 'react-redux';
-import { addAnecdote } from '../reducers/anecdotesReducer';
-import anecdotesServices from '../services/anecdotes';
-import {
-  setNotification,
-  clearNotification,
-} from '../reducers/notificationReducer';
+import { connect } from 'react-redux';
+import { createAnecdote } from '../reducers/anecdotesReducer';
+import { setNotification } from '../reducers/notificationReducer';
 
-const AnecdoteForm = () => {
-  const dispatch = useDispatch();
+const AnecdoteForm = (props) => {
+  const notifyCreate = (anecdote) => {
+    props.setNotification(`you created a new anecdote '${anecdote}'`, 5);
+  };
 
   const handleAnecdoteSubmit = async (e) => {
     e.preventDefault();
     const content = e.target.anecdote.value;
     e.target.anecdote.value = '';
-    const anecdote = await anecdotesServices.create(content);
-    dispatch(addAnecdote(anecdote));
-    dispatch(setNotification(`you created a new anecdote '${anecdote}'`));
-    setTimeout(() => dispatch(clearNotification()), 5000);
+    props.createAnecdote(content);
+    notifyCreate(content);
   };
 
   return (
@@ -32,4 +28,8 @@ const AnecdoteForm = () => {
   );
 };
 
-export default AnecdoteForm;
+const connectedAnecdoteForm = connect(null, {
+  setNotification,
+  createAnecdote,
+})(AnecdoteForm);
+export default connectedAnecdoteForm;
